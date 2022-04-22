@@ -4,7 +4,7 @@
 /.wwebjs_auth
 /node_modules
 /downloaded-media/log spairum/*.jpeg
-!/downloaded-media/
+!/downloaded-media
 #-------------------------
 # Temporary Files
 #-------------------------
