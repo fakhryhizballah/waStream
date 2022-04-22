@@ -47,14 +47,15 @@ client.on("ready", async () => {
             let data = JSON.parse(message);
             console.log(data.number);
             let noHp = phoneNumberFormatter(data.number);
-            let pesan = data.pesan;
+            let pesan = data.message;
             console.log(noHp);
+            console.log(pesan);
 
             const isRegistered = await checkRegisteredNumber(data.number);
             console.log(isRegistered);
             if (isRegistered) {
-                client.sendMessage(noHp, pesan).then(response => {
-                    // console.log(response);
+                client.sendMessage(noHp, data.message).then(response => {
+                    console.log(response);
                     console.log("Pesan Terkirim");
                 }).catch(err => {
                     console.log(err);
