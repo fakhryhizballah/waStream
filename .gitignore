@@ -3,7 +3,7 @@
 #-------------------------
 /.wwebjs_auth
 /node_modules
-/downloaded-media/**
+/downloaded-media/*
 !/downloaded-media/
 #-------------------------
 # Temporary Files
