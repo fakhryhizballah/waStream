@@ -1,4 +1,11 @@
+#-------------------------
+# Temporary folder
+#-------------------------
 /.wwebjs_auth
 /node_modules
-/downloaded-media/log spairum/*
-!/downloaded-media
+/downloaded-media/**
+!/downloaded-media/
+#-------------------------
+# Temporary Files
+#-------------------------
+package-lock.json
