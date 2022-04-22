@@ -1,0 +1,22 @@
+{
+  "name": "wastream",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon app.js"
+  },
+  "keywords": [
+    "WA API MQTT"
+  ],
+  "author": "Fakhry Hizballah",
+  "license": "ISC",
+  "dependencies": {
+    "mime-types": "^2.1.35",
+    "mqtt": "^4.3.7",
+    "qrcode-terminal": "^0.12.0",
+    "update": "^0.7.4",
+    "whatsapp-web.js": "^1.16.6"
+  }
+}
