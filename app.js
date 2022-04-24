@@ -1,5 +1,6 @@
 const { Client, LocalAuth, MessageMedia } = require("whatsapp-web.js");
 const { phoneNumberFormatter } = require('./helpers/formatter');
+// const { checkRegisteredNumber } = require('./helpers/profilecek');
 const qrcode = require("qrcode-terminal");
 const mqtt = require('./konektor/mqtt');
 const fs = require('fs');
@@ -87,6 +88,7 @@ client.on("ready", async () => {
         }
     });
 });
+
 client.on('disconnected', (reason) => {
     console.log('Session file deleted!');
     client.destroy();
@@ -129,16 +131,16 @@ client.on('message', async (msg) => {
             console.log(err);
         });
     }
-    const mentions = await msg.getMentions();
-    for (let contact of mentions) {
-        console.log(`${contact.pushname} was mentioned`);
-        console.log(msg.body + '\n');
-        var pesan = msg.body.slice(14);
-        console.log(mentions);
-        msg.reply('Sebentar ya ' + contact.pushname);
-    }
+    // const mentions = await msg.getMentions();
+    // for (let contact of mentions) {
+    //     console.log(`${contact.pushname} was mentioned`);
+    //     console.log(msg.body + '\n');
+    //     var pesan = msg.body.slice(14);
+    //     console.log(mentions);
+    //     msg.reply('Sebentar ya ' + contact.pushname);
+    // }
 })
-
+module.exports = client;
 const findGroupByName = async function (name) {
     const group = await client.getChats().then(chats => {
         return chats.find(chat =>
