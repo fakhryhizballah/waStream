@@ -13,6 +13,7 @@
   "author": "Fakhry Hizballah",
   "license": "ISC",
   "dependencies": {
+    "@sentry/node": "^6.19.7",
     "mime-types": "^2.1.35",
     "mqtt": "^4.3.7",
     "qrcode-terminal": "^0.12.0",

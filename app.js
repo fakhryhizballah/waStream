@@ -5,6 +5,16 @@ const qrcode = require("qrcode-terminal");
 const mqtt = require('./konektor/mqtt');
 const fs = require('fs');
 const mime = require('mime-types');
+const Sentry = require("@sentry/node");
+
+Sentry.init({
+    dsn: "https://a11c2db9538142629a13b6639c855d13@o1253817.ingest.sentry.io/6424120",
+
+    // Set tracesSampleRate to 1.0 to capture 100%
+    // of transactions for performance monitoring.
+    // We recommend adjusting this value in production
+    tracesSampleRate: 1.0,
+});
 
 console.log("Connection to Whatsapp Web Client");
 
@@ -39,9 +49,11 @@ client.on("qr", (qr) => {
 
 client.on('authenticated', async (session) => {
     console.log('WHATSAPP WEB => Authenticated');
+    Sentry.captureEvent("Authenticated")
 });
 
 client.on("ready", async () => {
+    Sentry.captureEvent("ready")
     console.log("WHATSAPP WEB => Ready");
     mqtt.client.on('message', async function (topic, message) {
         if (topic == 'sendPesan') {
@@ -60,6 +72,7 @@ client.on("ready", async () => {
                     console.log("Pesan Terkirim");
                 }).catch(err => {
                     console.log(err);
+                    Sentry.captureException(err);
                 });
             } else {
                 console.log('WHATSAPP WEB => User not registered');
@@ -83,6 +96,7 @@ client.on("ready", async () => {
                 }
                 console.log('No group found with name: ' + data.grup);
             } catch (error) {
+                Sentry.captureException(err);
                 console.log(error)
             }
         }
@@ -101,6 +115,7 @@ client.on('message', async (msg) => {
         // console.log(contacts.pushname);
         return contacts;
     }).catch(err => {
+        Sentry.captureException(err);
         console.log(err);
     });
     if (msg.hasMedia) {
@@ -128,17 +143,11 @@ client.on('message', async (msg) => {
                 }
             }
         }).catch(err => {
+            Sentry.captureException(err);
             console.log(err);
         });
     }
-    // const mentions = await msg.getMentions();
-    // for (let contact of mentions) {
-    //     console.log(`${contact.pushname} was mentioned`);
-    //     console.log(msg.body + '\n');
-    //     var pesan = msg.body.slice(14);
-    //     console.log(mentions);
-    //     msg.reply('Sebentar ya ' + contact.pushname);
-    // }
+
 })
 module.exports = client;
 const findGroupByName = async function (name) {
