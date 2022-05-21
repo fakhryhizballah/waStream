@@ -1,11 +1,7 @@
-#-------------------------
-# Temporary folder
-#-------------------------
-/.wwebjs_auth
-/node_modules
-/downloaded-media/*
-!/downloaded-media/file.txt
-#-------------------------
-# Temporary Files
-#-------------------------
-package-lock.json
+/nbproject/
+/.idea/*
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime-workspace
+*.sublime-project
