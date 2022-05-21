@@ -14,7 +14,7 @@ const client = new Client({
         // clientId: "client-one"
         restartOnAuthFail: true,
         puppeteer: {
-            headless: true,
+            headless: false,
             args: [
                 '--no-sandbox',
                 '--disable-setuid-sandbox',
@@ -39,6 +39,11 @@ client.on("qr", (qr) => {
 
 client.on('authenticated', async (session) => {
     console.log('WHATSAPP WEB => Authenticated');
+});
+
+client.on('auth_failure', msg => {
+    // Fired if session restore was unsuccessful
+    console.error('AUTHENTICATION FAILURE', msg);
 });
 
 client.on("ready", async () => {
@@ -91,9 +96,15 @@ client.on("ready", async () => {
 
 client.on('disconnected', (reason) => {
     console.log('Session file deleted!');
-    client.destroy();
-    client.initialize();
+    console.log('Client was logged out', reason);
+    // client.initialize();
+    client.resetState();
 });
+client.on('change_state', state => {
+    console.log('CHANGE STATE', state);
+});
+
+
 client.on('message', async (msg) => {
     console.log("------------------------------------------------------");
     // Downloading media
