@@ -5,7 +5,13 @@
 /node_modules
 /downloaded-media/*
 !/downloaded-media/file.txt
+
 #-------------------------
 # Temporary Files
 #-------------------------
 package-lock.json
+
+#-------------------------
+# Environment Variables
+#-------------------------
+.env

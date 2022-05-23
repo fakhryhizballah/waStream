@@ -1,9 +1,11 @@
 var mqtt = require('mqtt');
-// Prodution mqtt
-var client = mqtt.connect('mqtt://spairum.my.id', {
-    username: 'mqttuntan',
-    password: 'mqttuntan',
-    clientId: 'wa-client-1' + Math.random()
+require('dotenv').config();
+
+let client = mqtt.connect(process.env.mqtt_host, {
+    username: process.env.mqtt_username,
+    password: process.env.mqtt_password,
+    clientId: process.env.mqtt_client_id + Math.random(),
+    connectTimeout: 1000,
 });
 client.on('connect', function () {
     client.subscribe('sendPesan', function (err) {
