@@ -3,18 +3,20 @@ const { phoneNumberFormatter } = require('./helpers/formatter');
 // const { checkRegisteredNumber } = require('./helpers/profilecek');
 const qrcode = require("qrcode-terminal");
 const { clientMq } = require('./konektor/mqtt');
+const { logs, status } = require('./model/logModel');
 const fs = require('fs');
 const mime = require('mime-types');
-
 console.log("Connection to Whatsapp Web Client");
 
 
 const client = new Client({
+    // authStrategy: new NoAuth({
     authStrategy: new LocalAuth({
-        // clientId: "client-one"
-        restartOnAuthFail: true,
+        // clientId: "client-two",
+        // dataPath: "./data",
+        restartOnAuthFail: false,
         puppeteer: {
-            headless: false,
+            headless: true,
             args: [
                 '--no-sandbox',
                 '--disable-setuid-sandbox',
@@ -23,7 +25,7 @@ const client = new Client({
                 '--no-first-run',
                 '--no-zygote',
                 '--single-process', // <- this one doesn't works in Windows
-                '--disable-gpu'
+                '--disable-gpu',
             ],
         }
     })
@@ -48,50 +50,6 @@ client.on('auth_failure', msg => {
 
 client.on("ready", async () => {
     console.log("WHATSAPP WEB => Ready");
-    clientMq.on('message', async function (topic, message) {
-        if (topic == 'sendPesan') {
-            let data = JSON.parse(message);
-            console.log(data.number);
-            let noHp = phoneNumberFormatter(data.number);
-            let pesan = data.message;
-            console.log(noHp);
-            console.log(pesan);
-
-            const isRegistered = await checkRegisteredNumber(data.number);
-            console.log(isRegistered);
-            if (isRegistered) {
-                client.sendMessage(noHp, data.message).then(response => {
-                    console.log(response);
-                    console.log("Pesan Terkirim");
-                }).catch(err => {
-                    console.log(err);
-                });
-            } else {
-                console.log('WHATSAPP WEB => User not registered');
-            }
-        } else if (topic == 'sendGrup') {
-            try {
-                let data = JSON.parse(message);
-                console.log('nama Grub: ' + (data.grup));
-                console.log('pesan Grub: ' + data.message);
-
-                const group = await findGroupByName(data.grup);
-                if (group) {
-                    chatId = group.id._serialized;
-                    console.log(group.id._serialized);
-                    client.sendMessage(group.id._serialized, data.message).then(response => {
-                        // console.log(response);
-                        console.log("Pesan Grup Terkirim");
-                    }).catch(err => {
-                        console.log(err);
-                    });
-                }
-                console.log('No group found with name: ' + data.grup);
-            } catch (error) {
-                console.log(error)
-            }
-        }
-    });
 });
 
 client.on('disconnected', (reason) => {
@@ -165,3 +123,60 @@ const checkRegisteredNumber = async function (number) {
     const isRegistered = await client.isRegisteredUser(number);
     return isRegistered;
 }
+clientMq.on('message', async function (topic, message) {
+    if (topic == 'sendPesan') {
+        let data = JSON.parse(message);
+        console.log(data.number);
+        let noHp = phoneNumberFormatter(data.number);
+        let pesan = data.message;
+        console.log(noHp);
+        console.log(pesan);
+        try {
+            const isRegistered = await checkRegisteredNumber(data.number);
+            console.log(isRegistered);
+            if (isRegistered) {
+                client.sendMessage(noHp, data.message).then(response => {
+                    console.log(response);
+                    console.log("Pesan Terkirim");
+                    status(data.number, 'valid-send');
+                    logs(data.number, data.message, 'terkirim');
+                }).catch(err => {
+                    status(data.number, 'valid');
+                    console.log(err);
+                });
+            } else {
+                status(data.number, 'invalid');
+                logs(data.number, data.message, 'user-not-registered');
+                console.log('WHATSAPP WEB => User not registered');
+            }
+        }
+        catch (err) {
+            console.log(err);
+            logs(data.number, data.message, 'wa-error');
+            status(data.number, 'wa-error');
+        }
+
+    } else if (topic == 'sendGrup') {
+        try {
+            let data = JSON.parse(message);
+            console.log('nama Grub: ' + (data.grup));
+            console.log('pesan Grub: ' + data.message);
+
+            const group = await findGroupByName(data.grup);
+            if (group) {
+                chatId = group.id._serialized;
+                console.log(group.id._serialized);
+                client.sendMessage(group.id._serialized, data.message).then(response => {
+                    // console.log(response);
+                    console.log("Pesan Grup Terkirim");
+                }).catch(err => {
+                    console.log(err);
+                });
+            }
+            console.log('No group found with name: ' + data.grup);
+        } catch (error) {
+            console.log(error)
+            logs(data.grup, data.message, 'wa-error');
+        }
+    }
+});
