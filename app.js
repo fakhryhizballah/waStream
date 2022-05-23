@@ -2,7 +2,7 @@ const { Client, LocalAuth, MessageMedia } = require("whatsapp-web.js");
 const { phoneNumberFormatter } = require('./helpers/formatter');
 // const { checkRegisteredNumber } = require('./helpers/profilecek');
 const qrcode = require("qrcode-terminal");
-const mqtt = require('./konektor/mqtt');
+const { clientMq } = require('./konektor/mqtt');
 const fs = require('fs');
 const mime = require('mime-types');
 
@@ -48,7 +48,7 @@ client.on('auth_failure', msg => {
 
 client.on("ready", async () => {
     console.log("WHATSAPP WEB => Ready");
-    mqtt.client.on('message', async function (topic, message) {
+    clientMq.on('message', async function (topic, message) {
         if (topic == 'sendPesan') {
             let data = JSON.parse(message);
             console.log(data.number);
