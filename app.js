@@ -132,7 +132,7 @@ clientMq.on('message', async function (topic, message) {
         console.log(noHp);
         console.log(pesan);
         try {
-            const isRegistered = await checkRegisteredNumber(data.number);
+            const isRegistered = await checkRegisteredNumber(noHp);
             console.log(isRegistered);
             if (isRegistered) {
                 client.sendMessage(noHp, data.message).then(response => {
