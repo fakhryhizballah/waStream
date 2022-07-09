@@ -65,25 +65,46 @@ client.on('change_state', state => {
 
 client.on('message', async (msg) => {
     console.log("------------------------------------------------------");
-    console.log(msg.body);
+    console.log("Msg: " + msg.body);
+    // console.log(msg.author);
+    console.log("from: " + msg.from);
     // Downloading media
     await client.sendSeen(msg.from);
-    // getContact
-    await client.getContactById(msg.from).then(contacts => {
-        // console.log(contacts);
-        console.log(contacts.pushname);
-        return;
+    const getChats = await client.getChatById(msg.from).then(data => {
+        // console.log(data);
+        console.log("getChats: " + data.name);
+        // console.log("grub satus: " + data.isGroup);
+        return data;
     }).catch(err => {
         console.log(err);
     });
 
+    if (getChats.isGroup == true) {
+        console.log("Grub");
+        var getContact = await client.getContactById(msg.author).then(contacts => {
+            // console.log(contacts);
+            console.log("name: " + contacts.pushname);
+            return contacts.pushname;
+        }).catch(err => {
+            // console.log(err);
+        });
+    } else {
+        console.log("Private");
+        var getContact = await client.getContactById(msg.from).then(contacts => {
+            // console.log(contacts);
+            console.log("name: " + contacts.pushname);
+            return contacts.pushname;
+        }).catch(err => {
+            // console.log(err);
+        });
+    }
 
     if (msg.hasMedia) {
         msg.downloadMedia().then(media => {
             if (media) {
                 // The folder to store: change as you want!
                 // Create if not exists
-                const mediaPath = './downloaded-media/' + getContact.name + '/';
+                const mediaPath = './downloaded-media/' + getChats.name + '/';
                 if (!fs.existsSync(mediaPath)) {
                     fs.mkdirSync(mediaPath);
                 }
@@ -93,7 +114,7 @@ client.on('message', async (msg) => {
                 // I will use the time for this example
                 // Why not use media.filename? Because the value is not certain exists
                 const timeStamp = new Date().getTime();
-                const fullFilename = mediaPath + getContact.pushname + timeStamp + '.' + extension;
+                const fullFilename = mediaPath + getContact + timeStamp + '.' + extension;
                 // Save to file
                 try {
                     fs.writeFileSync(fullFilename, media.data, { encoding: 'base64' });
