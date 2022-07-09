@@ -6,6 +6,7 @@ const { clientMq } = require('./konektor/mqtt');
 const { logs, status } = require('./model/logModel');
 const fs = require('fs');
 const mime = require('mime-types');
+const { BroadcastChannel } = require("worker_threads");
 console.log("Connection to Whatsapp Web Client");
 
 
@@ -66,8 +67,8 @@ client.on('change_state', state => {
 client.on('message', async (msg) => {
     console.log("------------------------------------------------------");
     console.log("Msg: " + msg.body);
-    // console.log(msg.author);
-    console.log("from: " + msg.from);
+    // console.log(msg);
+    console.log("from : " + msg.from);
     // Downloading media
     await client.sendSeen(msg.from);
     const getChats = await client.getChatById(msg.from).then(data => {
@@ -81,6 +82,7 @@ client.on('message', async (msg) => {
 
     if (getChats.isGroup == true) {
         console.log("Grub");
+        var subfile = getChats.name;
         var getContact = await client.getContactById(msg.author).then(contacts => {
             // console.log(contacts);
             console.log("name: " + contacts.pushname);
@@ -88,8 +90,12 @@ client.on('message', async (msg) => {
         }).catch(err => {
             // console.log(err);
         });
-    } else {
+    } else if (getChats.id.server == 'broadcast') {
+        var subfile = "BroadcastChannel";
+        var getContact = msg._data.notifyName;
+    } else if (getChats.isGroup == false) {
         console.log("Private");
+        var subfile = getChats.name;
         var getContact = await client.getContactById(msg.from).then(contacts => {
             // console.log(contacts);
             console.log("name: " + contacts.pushname);
@@ -98,13 +104,14 @@ client.on('message', async (msg) => {
             // console.log(err);
         });
     }
+    console.log("get Contak : " + getContact + " sub : " + subfile);
 
     if (msg.hasMedia) {
         msg.downloadMedia().then(media => {
             if (media) {
                 // The folder to store: change as you want!
                 // Create if not exists
-                const mediaPath = './downloaded-media/' + getChats.name + '/';
+                const mediaPath = './downloaded-media/' + subfile + '/';
                 if (!fs.existsSync(mediaPath)) {
                     fs.mkdirSync(mediaPath);
                 }
