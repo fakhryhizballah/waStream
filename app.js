@@ -65,13 +65,19 @@ client.on('change_state', state => {
 
 client.on('message', async (msg) => {
     console.log("------------------------------------------------------");
+    console.log(msg.body);
     // Downloading media
-    const getContact = await client.getContactById(msg.from).then(contacts => {
-        // console.log(contacts.pushname);
-        return contacts;
+    await client.sendSeen(msg.from);
+    // getContact
+    await client.getContactById(msg.from).then(contacts => {
+        // console.log(contacts);
+        console.log(contacts.pushname);
+        return;
     }).catch(err => {
         console.log(err);
     });
+
+
     if (msg.hasMedia) {
         msg.downloadMedia().then(media => {
             if (media) {
