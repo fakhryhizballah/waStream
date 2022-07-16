@@ -8,17 +8,17 @@ const clientMq = mqtt.connect(process.env.mqtt_host, {
     connectTimeout: 1000,
 });
 clientMq.on('connect', function () {
-    clientMq.subscribe('sendPesan', function (err) {
+    clientMq.subscribe('$share/wa/sendPesan', function (err) {
         if (!err) {
             console.log("subscribe Ping sendPesan")
         }
     })
-    clientMq.subscribe('sendGrup', function (err) {
+    clientMq.subscribe('$share/wa/sendGrup', function (err) {
         if (!err) {
             console.log("subscribe sendGrup")
         }
     })
-    clientMq.subscribe('sendMedia', function (err) {
+    clientMq.subscribe('$share/wa/sendMedia', function (err) {
         if (!err) {
             console.log("subscribe sendGrup")
         }
