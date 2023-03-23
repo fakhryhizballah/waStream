@@ -18,6 +18,7 @@ let status = async function (nohp, status) {
             console.log("valid_wa records: " + result.affectedRows);
         });
     } else {
+        result.hit = parseInt(result.hit);
         let sql = `UPDATE valid_wa SET status= ?, hit= ?, updated_at= ? WHERE nohp= ?`;
         connection.query(sql, [status, result.hit + 1, date_ob, nohp], function (err, result) {
             if (err) throw err;
