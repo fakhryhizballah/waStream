@@ -1,12 +1,5 @@
 const { connection } = require('../konektor/sql');
 
-// connection.query("SELECT * FROM valid_wa WHERE nohp = '089'", function (err, result) {
-//     if (err) throw err;
-//     console.log(result[0].id);
-//     // return resolve(results);
-//     // return resolve(resultArray[0]);
-// });
-
 var getMesin = function (mesinID) {
     return new Promise((resolve, reject) => {
         connection.query("SELECT * FROM valid_wa WHERE nohp = '089'", (err, result) => {
